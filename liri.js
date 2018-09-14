@@ -1,7 +1,9 @@
 require("dotenv").config();
 var request = require("request");
 var Spotify = require('node-spotify-api');
-var bandsintown = require('bandsintown')(codingbootcamp);
+var bandsintown = require('bandsintown')('codingbootcamp');
+var moment = require("moment");
+var fs = require("fs");
 
 //import keys.js to acces sportify api key
 var keys = require("./keys.js");
@@ -17,7 +19,7 @@ switch (doThis) {
         concert();
         break;
     case "spotify-this-song":
-        spotify();
+        music();
         break;
     case "movie-this":
         movie();
@@ -28,23 +30,41 @@ switch (doThis) {
 };
 //concert-this
 
-function concert(){
-    console.log("concert search ran");
+function concert() {
+    //console.log("concert search ran");
     var artist = search;
-    bandsintown.getArtistEventList(artist);
-    
-    request(queryURL, function (error, response, body) {
-        console.log(JSON.stringify(response, null, 2));
+    bandsintown.getArtistEventList(artist)
+        .then(function (events) {
+            //console.log(events);
+            for (i = 0; i <= events.length; i++) {
+                console.log("Venue Name: " + events[i].venue.name);
+                console.log("Venue Location: " + events[i].venue.city + ", " + events[i].venue.country);
+                var date = events[i].datetime;
+                var dateformat = ("YYYY-MM-DDT00:00:00")
+                var convertedDate = moment(date, dateformat);
 
-        console.log(JSON.parse(response.body.))
-    })
-}
+                console.log("Date: " + moment(convertedDate).format("MM/DD/YYYY"));
+            }
+        })
+};
 
 
 //spotify-this-song
 
-function spotify(){
+function music() {
     console.log("Spotifty search ran")
+    spotify.search({ type: 'track', query: search, limit: 1 }, function(err, data) {
+        if (err) {
+          return console.log('Error occurred: ' + err);
+        }
+       
+      //console.log(JSON.stringify(data, null, 2)); 
+      console.log(JSON.stringify(data.tracks.items.artists.name))//song
+      console.log(JSON.stringify("Artists: " + data.tracks.items.album.name))//artist
+      console.log(JSON.stringify("Preview: " + data.tracks.items.preview_urls))//preview
+      //console.log(JSON.stringify(data.tracks.))//album
+      });
+
 }
 
 //movie-this
@@ -83,7 +103,17 @@ function movie() {
 }
 
 //do-what-it-says
-function doWhat(){
-    console.log("do what it says");
+function doWhat() {
+    //console.log("do what it says");
+    fs.readFile("random.txt", "utf8", function(error, data){
+        if (error) {
+            return console.log(error);
+          }
+        var output = data.split(",")
+        search = output[1];
+        music();
+
+    })
+    
 }
 
