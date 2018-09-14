@@ -1,6 +1,7 @@
 require("dotenv").config();
 var request = require("request");
 var Spotify = require('node-spotify-api');
+var bandsintown = require('bandsintown')(codingbootcamp);
 
 //import keys.js to acces sportify api key
 var keys = require("./keys.js");
@@ -29,13 +30,16 @@ switch (doThis) {
 
 function concert(){
     console.log("concert search ran");
+    var artist = search;
+    bandsintown.getArtistEventList(artist);
+    
+    request(queryURL, function (error, response, body) {
+        console.log(JSON.stringify(response, null, 2));
+
+        console.log(JSON.parse(response.body.))
+    })
 }
-//var artist = process.argv[3];
-//var queryURL = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp"
 
-//requestAnimationFrame(queryURL, function (error, response, body) {
-
-//})
 
 //spotify-this-song
 
